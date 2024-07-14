@@ -8,7 +8,7 @@
 #include <WiFiManager.h>
 
 #include "helper.h"
-//#include "WiFiStatusLED.h"
+#include "WiFiStatusLED.h"
 #include "GenericOutput.h"
 
 #define I2C_ADDRESS 0x20                    // Default address
@@ -16,7 +16,9 @@
 
 PCF8574 pcf8574(I2C_ADDRESS);
 DoubleResetDetector *drd;                    // Double click on reset button to enter configuration mode
-GenericOutput led(pcf8574, 0, LOW);
+GenericOutput R1(pcf8574, 0, OUTPUT_ACTIVE, 2000);
+GenericOutput R2(pcf8574, 1, OUTPUT_ACTIVE, 2000);
+GenericOutput R3(pcf8574, 2, OUTPUT_ACTIVE, 2000);
 
 
 bool isI2CCommunicationable(uint8_t address) {
@@ -33,9 +35,28 @@ void setup() {
     delay(2000);    // Allow time to open a serial monitor
 #endif
 
-    led.setDuration(5000);
-    led.onPowerChanged([]() {
-        D_Print("LED state: %s\n", led.getStateString().c_str());
+    // Init WiFi status LED
+    initWiFiStatusLED();
+
+    // Setup to turn on R1 -> R2 -> R3 -> R1 -> ...
+    R1.onPowerOff([]() {
+        R2.on();
+    });
+    R2.onPowerOff([]() {
+        R3.on();
+    });
+    R3.onPowerOff([]() {
+        R1.on();
+    });
+
+    R1.onPowerChanged([](){
+        D_Print("R1: %s\n", R1.getStateString().c_str());
+    });
+    R2.onPowerChanged([](){
+        D_Print("R2: %s\n", R2.getStateString().c_str());
+    });
+    R3.onPowerChanged([](){
+        D_Print("R3: %s\n", R3.getStateString().c_str());
     });
 
     // Start PCF8574
@@ -45,22 +66,6 @@ void setup() {
         delay(5000);
         ESP.restart();
     }
-
-    // Pin config
-    pcf8574.pinMode(0, OUTPUT);
-    pcf8574.pinMode(1, OUTPUT);
-    pcf8574.pinMode(2, OUTPUT);
-    pcf8574.pinMode(3, INPUT_PULLUP);
-    pcf8574.pinMode(4, INPUT_PULLUP);
-    pcf8574.pinMode(5, INPUT_PULLUP);
-    pcf8574.pinMode(6, INPUT_PULLUP);
-
-    pcf8574.digitalWrite(0, !OUTPUT_ACTIVE);
-    pcf8574.digitalWrite(1, !OUTPUT_ACTIVE);
-    pcf8574.digitalWrite(2, !OUTPUT_ACTIVE);
-
-    // Init WiFi status LED
-//    initWiFiStatusLED();
 
     drd = new DoubleResetDetector(10, 0);
     if (drd->detectDoubleReset()) {
@@ -83,23 +88,11 @@ void setup() {
 
 
     D_Print("Setup done\n");
-    led.on();
+
+    // Start the first relay
+    R1.on();
 }
 
 void loop() {
     drd->loop();    // double reset detector loop
-    led.loop();
-
-    // Sample test
-//    pcf8574.digitalWrite(0, OUTPUT_ACTIVE);
-//    delay(2000);
-//    pcf8574.digitalWrite(1, OUTPUT_ACTIVE);
-//    delay(2000);
-//    pcf8574.digitalWrite(2, OUTPUT_ACTIVE);
-//    delay(2000);
-//    pcf8574.digitalWrite(0, !OUTPUT_ACTIVE);
-//    delay(2000);
-//    pcf8574.digitalWrite(1, !OUTPUT_ACTIVE);
-//    delay(2000);
-//    pcf8574.digitalWrite(2, !OUTPUT_ACTIVE);
 }
