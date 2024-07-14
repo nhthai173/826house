@@ -116,6 +116,21 @@ protected:
     std::function<void()> _onFunction = nullptr;
     std::function<void()> _offFunction = nullptr;
 
+    /**
+     * @brief Ticker callback handler
+     * @param pOutput
+     */
+    static void _onTick(VirtualOutput* pOutput) {
+        if (pOutput->_pState == stdGenericOutput::WAIT_FOR_ON) {
+            pOutput->_pState = stdGenericOutput::ON;
+            pOutput->on();
+        } else if (pOutput->_pState == stdGenericOutput::ON) {
+            pOutput->off();
+            if (pOutput->_onAutoOff != nullptr) {
+                pOutput->_onAutoOff();
+            }
+        }
+    }
 };
 
 

@@ -2,6 +2,7 @@
 #define GENERIC_OUTPUT_H
 
 #include "GenericOutputBase.h"
+#include <Ticker.h>
 
 namespace stdGenericOutput {
 
@@ -130,20 +131,29 @@ public:
         _onAutoOff = std::move(onAutoOff);
     }
 
-    /**
-     * @brief function to be called in loop
-     *
-     */
-    void loop();
-
 protected:
+    Ticker _ticker;
     bool _autoOffEnabled = false;
     state_t _pState = stdGenericOutput::OFF;
     uint32_t _duration = 0;
-    uint32_t _onceTimeDuration = 0;
     uint32_t _pOnDelay = 0;
-    uint32_t _previousMillis = 0;
     std::function<void()> _onAutoOff = nullptr;
+
+    /**
+     * @brief Ticker callback handler
+     * @param pOutput
+     */
+    static void _onTick(GenericOutput* pOutput) {
+        if (pOutput->_pState == stdGenericOutput::WAIT_FOR_ON) {
+            pOutput->_pState = stdGenericOutput::ON;
+            pOutput->on();
+        } else if (pOutput->_pState == stdGenericOutput::ON) {
+            pOutput->off();
+            if (pOutput->_onAutoOff != nullptr) {
+                pOutput->_onAutoOff();
+            }
+        }
+    }
 };
 
 

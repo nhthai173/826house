@@ -5,18 +5,28 @@ void GenericOutput::on()
     if (_state) return;
     if (_pOnDelay > 0 && _pState != stdGenericOutput::ON)
     {
-        _previousMillis = millis();
         _pState = stdGenericOutput::WAIT_FOR_ON;
+        _ticker.detach();
+        _ticker.once_ms(_pOnDelay, _onTick, this);
         return;
     }
     _pState = stdGenericOutput::ON;
-    _previousMillis = millis();
     GenericOutputBase::on();
+    if (_autoOffEnabled && _duration > 0)
+    {
+        _ticker.detach();
+        _ticker.once_ms(_duration, _onTick, this);
+    }
 }
 
 void GenericOutput::on(uint32_t duration) {
-    _onceTimeDuration = duration;
-    on();
+    _pState = stdGenericOutput::ON;
+    GenericOutputBase::on();
+    if (_autoOffEnabled)
+    {
+        _ticker.detach();
+        _ticker.once_ms(duration, _onTick, this);
+    }
 }
 
 void GenericOutput::onPercentage(uint8_t percentage) {
@@ -29,6 +39,7 @@ void GenericOutput::off()
     if (!_state) return;
     _pState = stdGenericOutput::OFF;
     GenericOutputBase::off();
+    _ticker.detach();
 }
 
 void GenericOutput::setPowerOnDelay(uint32_t delay)
@@ -61,34 +72,4 @@ uint32_t GenericOutput::getDuration() const
 
 uint32_t GenericOutput::getPowerOnDelay() const {
     return _pOnDelay;
-}
-
-void GenericOutput::loop()
-{
-    if (_autoOffEnabled && _state)
-    {
-        if (millis() >= _previousMillis + _duration)
-        {
-            off();
-            if (_onAutoOff != nullptr)
-            {
-                _onAutoOff();
-            }
-        }
-    }
-    else if (_onceTimeDuration > 0 && _state) {
-        if (millis() >= _previousMillis + _onceTimeDuration) {
-            _onceTimeDuration = 0;
-            off();
-            if (_onAutoOff != nullptr)
-            {
-                _onAutoOff();
-            }
-        }
-    }
-    if (_pState == WAIT_FOR_ON && millis() >= _previousMillis + _pOnDelay)
-    {
-        _pState = stdGenericOutput::ON;
-        on();
-    }
 }
