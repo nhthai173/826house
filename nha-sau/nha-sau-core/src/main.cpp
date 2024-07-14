@@ -8,13 +8,15 @@
 #include <WiFiManager.h>
 
 #include "helper.h"
-#include "WiFiStatusLED.h"
+//#include "WiFiStatusLED.h"
+#include "GenericOutput.h"
 
 #define I2C_ADDRESS 0x20                    // Default address
 #define OUTPUT_ACTIVE LOW                   // output active level
 
 PCF8574 pcf8574(I2C_ADDRESS);
-DoubleResetDetector *drd;                   // Double click on reset button to enter configuration mode
+DoubleResetDetector *drd;                    // Double click on reset button to enter configuration mode
+GenericOutput led(pcf8574, 0, LOW);
 
 
 bool isI2CCommunicationable(uint8_t address) {
@@ -30,6 +32,11 @@ void setup() {
 #if defined(DEBUG)
     delay(2000);    // Allow time to open a serial monitor
 #endif
+
+    led.setDuration(5000);
+    led.onPowerChanged([]() {
+        D_Print("LED state: %s\n", led.getStateString().c_str());
+    });
 
     // Start PCF8574
     pcf8574.begin();
@@ -53,7 +60,7 @@ void setup() {
     pcf8574.digitalWrite(2, !OUTPUT_ACTIVE);
 
     // Init WiFi status LED
-    initWiFiStatusLED();
+//    initWiFiStatusLED();
 
     drd = new DoubleResetDetector(10, 0);
     if (drd->detectDoubleReset()) {
@@ -76,21 +83,23 @@ void setup() {
 
 
     D_Print("Setup done\n");
+    led.on();
 }
 
 void loop() {
     drd->loop();    // double reset detector loop
+    led.loop();
 
     // Sample test
-    pcf8574.digitalWrite(0, OUTPUT_ACTIVE);
-    delay(2000);
-    pcf8574.digitalWrite(1, OUTPUT_ACTIVE);
-    delay(2000);
-    pcf8574.digitalWrite(2, OUTPUT_ACTIVE);
-    delay(2000);
-    pcf8574.digitalWrite(0, !OUTPUT_ACTIVE);
-    delay(2000);
-    pcf8574.digitalWrite(1, !OUTPUT_ACTIVE);
-    delay(2000);
-    pcf8574.digitalWrite(2, !OUTPUT_ACTIVE);
+//    pcf8574.digitalWrite(0, OUTPUT_ACTIVE);
+//    delay(2000);
+//    pcf8574.digitalWrite(1, OUTPUT_ACTIVE);
+//    delay(2000);
+//    pcf8574.digitalWrite(2, OUTPUT_ACTIVE);
+//    delay(2000);
+//    pcf8574.digitalWrite(0, !OUTPUT_ACTIVE);
+//    delay(2000);
+//    pcf8574.digitalWrite(1, !OUTPUT_ACTIVE);
+//    delay(2000);
+//    pcf8574.digitalWrite(2, !OUTPUT_ACTIVE);
 }
