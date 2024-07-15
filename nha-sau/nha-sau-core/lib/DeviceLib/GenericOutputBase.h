@@ -64,6 +64,12 @@ public:
     void toggle();
 
     /**
+     * @brief Set the power state
+     * @param state
+     */
+    void setState(bool state);
+
+    /**
      * @brief Set the power state from string "ON" or "OFF"
      * 
      * @param state 

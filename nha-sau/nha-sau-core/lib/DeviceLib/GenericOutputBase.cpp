@@ -69,6 +69,14 @@ void stdGenericOutput::GenericOutputBase::toggle() {
     }
 }
 
+void stdGenericOutput::GenericOutputBase::setState(bool state) {
+    if (state) {
+        on();
+    } else {
+        off();
+    }
+}
+
 void stdGenericOutput::GenericOutputBase::setState(const String& state) {
     if (state.startsWith("ON")) {
         on();
