@@ -1,0 +1,16 @@
+#ifndef NVS_V2_MINI_PIN_CONFIG_H
+#define NVS_V2_MINI_PIN_CONFIG_H
+
+
+// Pin definitions
+#define IR_PIN 4
+#define RELAY_PIN 5
+#define RELAY_ACTIVE_STATE LOW
+#define DOOR_SENSOR_PIN 13
+#define DOOR_SENSOR_ACTIVE_STATE LOW
+#define PIR_SENSOR_PIN 12
+#define PIR_SENSOR_ACTIVE_STATE LOW
+
+#define DEVICE_NAME "nhavesinh"
+
+#endif //NVS_V2_MINI_PIN_CONFIG_H
