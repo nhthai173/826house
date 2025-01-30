@@ -1,0 +1,7 @@
+.pio
+.vscode
+cmake-build-debug
+cmake-build-nodemcuv2
+.idea
+CMakeLists.txt
+CMakeListsPrivate.txt
