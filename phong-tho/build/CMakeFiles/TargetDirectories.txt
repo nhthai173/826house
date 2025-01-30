@@ -1,5 +1,0 @@
-/Users/thainguyen/Desktop/code/Firebase_IoT/den_tho/build/CMakeFiles/Production.dir
-/Users/thainguyen/Desktop/code/Firebase_IoT/den_tho/build/CMakeFiles/Debug.dir
-/Users/thainguyen/Desktop/code/Firebase_IoT/den_tho/build/CMakeFiles/Z_DUMMY_TARGET.dir
-/Users/thainguyen/Desktop/code/Firebase_IoT/den_tho/build/CMakeFiles/edit_cache.dir
-/Users/thainguyen/Desktop/code/Firebase_IoT/den_tho/build/CMakeFiles/rebuild_cache.dir
