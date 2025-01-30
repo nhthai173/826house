@@ -5,3 +5,4 @@ cmake-build-nodemcuv2
 .idea
 CMakeLists.txt
 CMakeListsPrivate.txt
+projectFilesBackup/*
